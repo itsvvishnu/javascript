@@ -73,3 +73,28 @@ const getNumber1 = numbers[1];
 const getNumber100 = numbers[100];
 
 console.log(getNumber1,getNumber100);
+
+/**
+ * We can use Proxy to implement any logic for “default” values.
+ * Imagine we have a dictionary, with phrases and their translations:
+ */
+
+ const dictionary = {
+    hi:"hola",
+    bye:"adios"
+ };
+
+ const dictionaryProxy = new Proxy(dictionary,{
+    get(target:any,prop){
+        if(prop in target){
+            return target[prop]
+        }
+        return prop;
+    }
+ });
+
+console.log(dictionaryProxy["hi"]);
+console.log(dictionaryProxy["bye"]);
+console.log(dictionaryProxy["how are you"]);
+
+console.clear();
