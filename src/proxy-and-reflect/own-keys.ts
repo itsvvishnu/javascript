@@ -115,3 +115,51 @@ let user = {
 
     for( let key in protectedUser ) console.log(key)
 
+    /**
+     * Has trap
+     */
+
+    let range = {
+        start: 1,
+        end: 10
+    };
+
+    range = new Proxy(range, {
+        has(target:any, prop:any):boolean{
+            return  prop > target.start && prop < target.end
+        }
+    })
+
+    console.log( 2 in range)
+    console.log( 5 in range)
+    console.log( 15 in range)
+
+    /**
+     * Wrapping functions: "apply"
+    We can wrap a proxy around a function as well.
+
+    The apply(target, thisArg, args) trap handles calling a proxy as function:
+
+    target is the target object (function is an object in JavaScript),
+    thisArg is the value of this.
+    args is a list of arguments.
+     */
+
+
+    function delay(fn:any,ms:number) {
+        return new Proxy(fn,{
+            apply(target,thisArg,args){
+                setTimeout( target.apply(thisArg,args), ms)
+            }
+        })
+    }
+
+    function sayHi(user:any) {
+        console.log(`Hello ${user}!`)
+    }
+
+    const sayHi2 = delay(sayHi, 3000);
+
+    console.log(sayHi2.name,sayHi2.length)
+
+    sayHi2("John")
