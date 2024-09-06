@@ -71,10 +71,14 @@ let user = {
 
     let protectedUser:any = {
          name: "John",
-        _password: "secret"
+        _password: "secret",
+        hasPassword: function() {
+            if(this._password) return true;
+            return false;
+        }
     }
 
-    const propStartsWith_ =(prop:string) => prop[0] === "_";
+    const propStartsWith_ = (prop:string) => prop[0] === "_";
 
     protectedUser = new Proxy(protectedUser, {
         set(target:any,prop,val){
@@ -88,10 +92,26 @@ let user = {
             if(propStartsWith_(prop as string)){
                 throw new Error("Access denied");
             }
-            return target[prop]
+            return typeof prop === "string" ? target[prop].bind(target):target[prop]
+        },
+        deleteProperty(target,prop){
+            if(propStartsWith_(prop as string)){
+                throw new Error("Access denied");
+            }
+            delete target[prop]
+            return true;
+        },
+        ownKeys(target){
+            return Object.keys(target).filter( (key:any) => !propStartsWith_(key))
         }
     });
 
     console.log(protectedUser["age"] = 23,protectedUser);
     // console.log(protectedUser["_age"] = 23, protectedUser);
-    console.log(protectedUser["_age"])
+    // console.log(protectedUser["_age"])
+    // console.log(delete protectedUser["age"])
+
+    console.log(protectedUser.hasPassword())
+
+    for( let key in protectedUser ) console.log(key)
+
